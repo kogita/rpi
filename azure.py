@@ -1,5 +1,6 @@
 import sys
 import requests
+import xml.etree.ElementTree as ET
 import keys
 
 def caption_stored_image(img_file_path):
@@ -12,13 +13,10 @@ def caption_stored_image(img_file_path):
     params = {"visualFeatures" : "Description"}
 
     try:
-        print("m001\n")
         res = requests.request("POST", url, json=json, data=data,
                                     headers=headers, params=params)
-        print("m002\n")
         result = res.json()
-        print("m003\n")
-        print(result)
+#        print(result)
         return result["description"]["captions"][0]["text"]
     except Exception as e:
         print("e.args", e.args)
@@ -37,17 +35,20 @@ def get_translation(text, lang1, lang2, access_token):
               "text" : text}
     url = "https://api.microsofttranslator.com/v2/http.svc/GetTranslations"
     try:
-        print("m011\n")
         res = requests.request("POST", url,
                                headers=headers, params=params)
-        print("m012\n")
-        print(res.text)
-        return res.text
+        return extract_transleted_text(res.text.encode('utf-8'))
+    except Exception as e:
+        print("e.args", e.args)
+
+def extract_transleted_text(xml_string):
+    try:
+        parsed = ET.fromstring(xml_string)
+        return parsed[1][0][4].text
     except Exception as e:
         print("e.args", e.args)
 
 if __name__ == '__main__':
-    print("main\n")
     argvs = sys.argv
     argc = len(argvs)
     if (argc != 2):
@@ -58,6 +59,6 @@ if __name__ == '__main__':
     caption = caption_stored_image(argvs[1])
     print(caption)
     access_token = get_access_token(keys.TT_KEY)
-    print(access_token)
+#    print(access_token)
     text = get_translation(caption, "en-us", "ja-jp", access_token)
     print(text)
