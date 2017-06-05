@@ -16,7 +16,7 @@ def caption_stored_image(img_file_path):
         res = requests.request("POST", url, json=json, data=data,
                                     headers=headers, params=params)
         result = res.json()
-#        print(result)
+        # print(result)
         return result["description"]["captions"][0]["text"]
     except Exception as e:
         print("e.args", e.args)
@@ -44,6 +44,7 @@ def get_translation(text, lang1, lang2, access_token):
 def extract_transleted_text(xml_string):
     try:
         parsed = ET.fromstring(xml_string)
+        # print(ET.tostring(parsed))
         return parsed[1][0][4].text
     except Exception as e:
         print("e.args", e.args)

@@ -3,6 +3,8 @@
 import time
 import picamera
 import Adafruit_CharLCD as LCD
+import azure
+import keys
 
 camera = picamera.PiCamera()
 
@@ -31,10 +33,17 @@ try:
                 lcd.message(button[1])
                 lcd.set_color(button[2][0], button[2][1], button[2][2])
 
-                camera.capture('image.jpg')
+                camera.capture('img.jpg')
+                caption = azure.caption_stored_image('img.jpg')
+                print(caption)
+                access_token = azure.get_access_token(keys.TT_KEY)
+                text = azure.get_translation(caption, "en-us", "ja-jp", access_token)
+                print(text)
+    
                 lcd.set_color(0.0, 0.0, 1.0)  # Blue
                 lcd.clear()
-                lcd.message('Push SELECT')
+                lcd.message(caption[0:16] + "\n" + caption[16:])
+
 except KeyboardInterrupt:
     lcd.set_color(0.0, 0.0, 0.0)  # Off
     lcd.clear()
